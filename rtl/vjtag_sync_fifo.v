@@ -25,7 +25,7 @@ module vjtag_sync_fifo #(parameter fifowidth = 32, parameter fifodepth = 6, para
 
 `default_nettype none
 
-reg [fifowidth-1:0] storage [2**fifodepth];
+reg [fifowidth-1:0] storage [0:2**fifodepth-1];
 reg [fifodepth-1:0] readptr;
 reg [fifodepth-1:0] writeptr=0;
 reg [fifodepth-1:0] writeptr_next=1;

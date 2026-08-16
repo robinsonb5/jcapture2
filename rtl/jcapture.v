@@ -138,7 +138,7 @@ always @(posedge clk) begin
 				jcapture_ir_setinvert : triginvert <= drfromjtag[triggersize-1:0];
 				jcapture_ir_setedge   : trigedge   <= drfromjtag[triggersize-1:0];
 				default : ;
-			endcase;
+			endcase
 		end
 	end
 	if(!reset_n) begin
@@ -191,7 +191,7 @@ always @(posedge clk) begin
 			end
 			default :
 				;
-		endcase;
+		endcase
 	end
 	if(!reset_n) begin
 		subsample_schedule <= 6'b0;
@@ -217,8 +217,12 @@ localparam jcapture_cmd_notify_trigger = 4'd5;
 // connect directly to a true JTAG TAP or the Intel Virtual JTAG module in
 // future.
 
-typedef enum logic [2:0] { STATE_IDLE,STATE_CAPTURE,STATE_FILL,STATE_READ, STATE_NOTIFY_TRIGGER } capstate_t;
-capstate_t capstate;
+localparam STATE_IDLE = 4'd0;
+localparam STATE_CAPTURE = 4'd1;
+localparam STATE_FILL = 4'd2;
+localparam STATE_READ = 4'd3;
+localparam STATE_NOTIFY_TRIGGER = 4'd4;
+reg [3:0] capstate;
 
 reg fifo_reset_n;
 

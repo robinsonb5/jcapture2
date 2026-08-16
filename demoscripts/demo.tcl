@@ -4,7 +4,8 @@
 #
 
 # Setup code in common between the three demo scripts
-source prologue.tcl
+set loc [file dirname [file normalize [info script]]]
+source ${loc}/prologue.tcl
 
 puts ""
 puts "Turning on LED"
