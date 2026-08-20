@@ -238,20 +238,22 @@ always @(posedge clk)
 assign jtag_reset_n = jtag_reset_s[0];
 
 // Instantiate the TAP
-wire [1:0] tck;
-wire [1:0] tdi;
-wire [1:0] sel;
-wire [1:0] shift;
-wire [1:0] update;
-wire [1:0] tdo;
+wire [1:0] jtck;
+wire [1:0] jtdi;
+wire [1:0] jsel;
+wire [1:0] jshift;
+wire [1:0] jupdate;
+wire [1:0] jcapture;
+wire [1:0] jtdo;
 
 vjtag jtag_inst (
-	.tck(tck),
-	.tdi(tdi),
-	.sel(sel),
-	.shift(shift),
-	.update(update),
-	.tdo(tdo),
+	.tck(jtck),
+	.tdi(jtdi),
+	.sel(jsel),
+	.shift(jshift),
+	.capture(jcapture),
+	.update(jupdate),
+	.tdo(jtdo),
 	.reset_n(jtag_reset_u)
 );
 
@@ -390,12 +392,13 @@ vjtag_sync_fifo #(.fifowidth(capturewidth+1),.fifodepth(capturedepth)) fifo (
 vjtag_register #(.bits(jtag_irsize)) vir (
 	// JTAG plumbing and system clock (must be significantly faster than the JTAG clock)
 	.sysclk(clk),
-	.tck(tck[0]),
-	.tdi(tdi[0]),
-	.sel(sel[0]),
-	.shift(shift[0]),
-	.update(update[0]),
-	.tdo(tdo[0]),
+	.tck(jtck[0]),
+	.tdi(jtdi[0]),
+	.sel(jsel[0]),
+	.shift(jshift[0]),
+	.capture(jcapture[0]),
+	.update(jupdate[0]),
+	.tdo(jtdo[0]),
 	// Input, output and update signal.
 	.d({jtag_irsize{1'b0}}),
 	.q(irfromjtag),
@@ -430,12 +433,13 @@ end
 vjtag_register #(.bits(jtag_drsize)) vdr (
 	// JTAG plumbing and system clock (must be significantly faster than the JTAG clock)
 	.sysclk(clk),
-	.tck(tck[1]),
-	.tdi(tdi[1]),
-	.sel(sel[1]),
-	.shift(shift[1]),
-	.update(update[1]),
-	.tdo(tdo[1]),
+	.tck(jtck[1]),
+	.tdi(jtdi[1]),
+	.sel(jsel[1]),
+	.shift(jshift[1]),
+	.capture(jcapture[1]),
+	.update(jupdate[1]),
+	.tdo(jtdo[1]),
 	// Input, output and update signal.
 	.d(drtojtag),
 	.q(drfromjtag),

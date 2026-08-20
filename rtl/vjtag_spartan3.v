@@ -1,4 +1,4 @@
-// VJTAG implementation for Lattice ECP5
+// VJTAG implementation for Spartan3
 
 // Implement a register of selectable width, accessible over JTAG
 // but with operations happening in the system clock domain.
@@ -10,9 +10,9 @@ module vjtag_register #(parameter bits=32) (
 	input tdi,
 	input sel,
 	input shift,
-	input capture, // Not available on ECP5 / GW2AR
 	input update,
-	output reg tdo,
+	input capture,
+	output tdo,
 	input [bits-1:0] d,
 	output reg [bits-1:0] q,
 	output reg upd
@@ -30,6 +30,14 @@ wire tck_p,tck_n; // Rising and falling edges of JTAG clock, in sysclk domain
 assign tck_p=tck_s[2:1]==2'b01 ? 1'b1 : 1'b0;
 assign tck_n=tck_s[2:1]==2'b10 ? 1'b1 : 1'b0;
 
+reg [2:0] update_s; // Update signal synced to sysclk domain
+
+always @(posedge sysclk) begin
+	update_s <= {update_s[1:0],update};
+end
+
+wire update_p;
+assign update_p = update_s[2:1] == 2'b01 ? 1'b1 : 1'b0;
 
 // As we leave the shift state we latch the previous value of tdi.
 // Without this, we lose the last bit shifted when doing a multi-part
@@ -47,29 +55,31 @@ end
 wire tdi_mux = shift_d ? tdi : tdi_latched;
 
 reg [bits-1:0] shiftreg;
-wire [bits-1:0] shiftnext = {tdi_mux,shiftreg[bits-1:1]};
+wire [bits-1:0] shiftnext = {tdi,shiftreg[bits-1:1]};
 reg selected;
+
+
+assign tdo = shiftreg[0];
 
 always @(posedge sysclk) begin
 	upd <= 1'b0;
 
 	if(tck_p) begin
 
-		if(sel && !shift) // Work around the lack of a capture signal
+		if(capture)
 			shiftreg <= d;
-	
+
 		if(shift)
 			selected <= sel;
 
 		if(shift && sel) begin
-			tdo <= shiftreg[0];
 			shiftreg <= shiftnext;
 		end
+	end
 
-		if(update && selected) begin
-			q <= shiftnext;
-			upd <= 1'b1;
-		end
+	if(update_p && selected) begin
+		q <= shiftreg;
+		upd <= 1'b1;
 	end
 end
 
@@ -84,41 +94,42 @@ module vjtag (
 	output [1:0] tdi,
 	output [1:0] sel,
 	output [1:0] shift,
-	output [1:0] capture, // Not available on ECP5 / GW2AR
 	output [1:0] update,
+	output [1:0] capture,
 	input [1:0] tdo,
 	output reset_n
 );
 
-assign capture = 2'b00;
+wire jtck1,jtck2,jtdi,jshift,jcapture,jupdate,jrst,jce1,jce2;
 
-wire jtck,jtdi,jshift,jupdate,jrstn,jce1,jce2;
-
-JTAGG jtag_inst (
-	.JTCK(jtck),
-	.JTDI(jtdi),
-	.JSHIFT(jshift),
-	.JUPDATE(jupdate),
-	.JRSTN(jrstn),
-	.JCE1(jce1),
-	.JCE2(jce2),
-	.JRTI1(),
-	.JRTI2(),
-	.JTDO1(tdo[0]),
-	.JTDO2(tdo[1])
+BSCAN_SPARTAN3 jtag_inst (
+	.DRCK1(jtck1),
+	.DRCK2(jtck2),
+	.TDI(jtdi),
+	.SHIFT(jshift),
+	.CAPTURE(jcapture),
+	.UPDATE(jupdate),
+	.RESET(jrst),
+	.SEL1(jce1),
+	.SEL2(jce2),
+	.TDO1(tdo[0]),
+	.TDO2(tdo[1])
 );
 
-assign reset_n = jrstn;
 
-assign tck[0] = jtck;
+assign reset_n = ~jrst;
+
+assign tck[0] = jtck1;
 assign tdi[0] = jtdi;
 assign shift[0] = jshift;
+assign capture[0] = jcapture;
 assign update[0] = jupdate;
 assign sel[0] = jce1;
 
-assign tck[1] = jtck;
+assign tck[1] = jtck2;
 assign tdi[1] = jtdi;
 assign shift[1] = jshift;
+assign capture[1] = jcapture;
 assign update[1] = jupdate;
 assign sel[1] = jce2;
 
