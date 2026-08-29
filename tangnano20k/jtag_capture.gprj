@@ -1,0 +1,15 @@
+<?xml version="1" encoding="UTF-8"?>
+<!DOCTYPE gowin-fpga-project>
+<Project>
+    <Template>FPGA</Template>
+    <Version>5</Version>
+    <Device name="GW2AR-18C" pn="GW2AR-LV18QN88C8/I7">gw2ar18c-000</Device>
+    <FileList>
+        <File path="/home/amr/FPGA/Projects/jcapture2/rtl/jcapture.v" type="file.verilog" enable="1"/>
+        <File path="/home/amr/FPGA/Projects/jcapture2/rtl/vjtag_gw2a.v" type="file.verilog" enable="1"/>
+        <File path="/home/amr/FPGA/Projects/jcapture2/rtl/vjtag_sync_fifo.v" type="file.verilog" enable="1"/>
+        <File path="top.v" type="file.verilog" enable="1"/>
+        <File path="jtag_capture.cst" type="file.cst" enable="1"/>
+        <File path="jtag_capture.sdc" type="file.sdc" enable="1"/>
+    </FileList>
+</Project>

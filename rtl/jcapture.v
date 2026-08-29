@@ -37,14 +37,14 @@ module jcapture #(
 	parameter runlengthencoding=1, // Disable to reduce logic footprint and increase speed.
 	parameter designid = 16'h35ac
 ) (
-	input clk,
-	input reset_n,
-	input stb,
-	input [capturewidth-1:0] capture_d,
+	input wire clk,
+	input wire reset_n,
+	input wire stb,
+	input wire [capturewidth-1:0] capture_d,
 	output reg trigger_match,		// Strobe on trigger, when enabled by host
 	output reg [userirwidth-1:0] user_ir,
 	output reg user_ir_update,
-	input [userwidth-1:0] user_d,
+	input wire [userwidth-1:0] user_d,
 	output reg [userwidth-1:0] user_q,
 	output reg user_update
 );
