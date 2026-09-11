@@ -4,21 +4,21 @@
 // but with operations happening in the system clock domain.
 // (Hopefully will solve issues with JTAG becoming unreliable in busy designs.)
 
+`default_nettype none
+
 module vjtag_register #(parameter bits=32) (
-	input sysclk,
-	input tck,
-	input tdi,
-	input sel,
-	input shift,
-	input capture, // Not available on ECP5 / GW2AR
-	input update,
+	input wire sysclk,
+	input wire tck,
+	input wire tdi,
+	input wire sel,
+	input wire shift,
+	input wire capture, // Not available on ECP5 / GW2AR
+	input wire update,
 	output reg tdo,
-	input [bits-1:0] d,
+	input wire [bits-1:0] d,
 	output reg [bits-1:0] q,
 	output reg upd
 );
-
-`default_nettype none
 
 reg [2:0] tck_s; // JTAG clock synced to sysclk domain
 

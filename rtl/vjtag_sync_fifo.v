@@ -6,6 +6,8 @@
 // write pointer with an offset of 1/4, 1/2 or 3/4 of the FIFO depth,
 // effectively disabling the full / empty logic.
 
+`default_nettype none
+
 module vjtag_sync_fifo #(parameter fifowidth = 32, parameter fifodepth = 6, parameter runlengthencoding=1) (
 	input wire sysclk,
 	input wire reset_n,
@@ -22,8 +24,6 @@ module vjtag_sync_fifo #(parameter fifowidth = 32, parameter fifodepth = 6, para
 	
 	input wire [1:0] leadin
 );
-
-`default_nettype none
 
 reg [fifowidth-1:0] storage [0:2**fifodepth-1];
 reg [fifodepth-1:0] readptr;
