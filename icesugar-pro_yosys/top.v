@@ -1,4 +1,4 @@
-// JTAG Toplevel for panologic_g1
+// JTAG Toplevel for IceSugar-Pro
 
 `default_nettype none
 

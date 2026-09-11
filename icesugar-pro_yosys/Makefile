@@ -15,10 +15,10 @@ all: help
 	@rm -f $(OUTPUT).bit $(OUTPUT).config $(OUTPUT).json
 	@yosys >synth.log -p 'read_verilog -sv $(VERILOG_SOURCES); synth_ecp5 -top top -json $@'
 
-%.config: %.json icesugarpro.lpf
+%.config: %.json icesugar-pro.lpf
 	@echo ""
 	@echo "Running place-and-route (nextpnr)"
-	@nextpnr-ecp5 2>pnr.log --$(FPGA_SIZE) --package $(PACKAGE) --lpf icesugarpro.lpf --json $< --textcfg $@
+	@nextpnr-ecp5 2>pnr.log --$(FPGA_SIZE) --package $(PACKAGE) --lpf icesugar-pro.lpf --json $< --textcfg $@
 
 %.bit: %.config
 	@echo ""
@@ -28,7 +28,7 @@ all: help
 build: $(OUTPUT).bit
 
 config: build
-# The IceSugarPro's internal cmsis-dap programmer isn't recognised by openFPGALoader
+# The IceSugar-Pro's internal cmsis-dap programmer isn't recognised by openFPGALoader
 # but works as long you specify the correct USB vendor and product ID.
 # (OpenOCD can recognise it from the string "CMSIS-DAP" in the USB product string)
 	openFPGALoader -c cmsisdap --vid 0x1d50 --pid 0x602b $(OUTPUT).bit
@@ -38,7 +38,7 @@ config: build
 	@echo "See also the capvcd.tcl and capcsv.tcl scripts."
 	
 run:
-	openocd -f icesugarpro.cfg -f ../demoscripts/demo.tcl
+	openocd -f icesugar-pro.cfg -f ../demoscripts/demo.tcl
 	@echo ""
 	@echo "To repeat the JTAG test, run the demo.tcl script."
 	@echo "See also the capvcd.tcl and capcsv.tcl scripts."
