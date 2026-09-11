@@ -7,10 +7,6 @@ OUTPUT=impl/pnr/jtag_capture.fs
 
 all: help
 
-%.json: $(VERILOG_SOURCES)
-	rm -f $(OUTPUT).bit $(OUTPUT).config $(OUTPUT).json
-	yosys -p 'read_verilog -sv $(VERILOG_SOURCES); synth_ecp5 -top top -json $@'
-
 $(GOWIN_EDA):
 	@echo ""
 	@echo "Please install Gowin EDA, then set GOWINHOME to the"
