@@ -1,29 +1,33 @@
 JCAPTURE_DIR = ../rtl/
+FPGA_FAMILY = gw2a
 include $(JCAPTURE_DIR)/jcapture.mk
 VERILOG_SOURCES = $(JCAPTURE_VERILOG_SOURCES) top.v
 TEST_SOURCES := $(wildcard tb/*.v) $(wildcard tb/*.sv)
-GOWIN_EDA=$(GOWINHOME)/IDE/bin/gw_sh
-OUTPUT=impl/pnr/jtag_capture.fs
+PACKAGE := CABGA256
+FPGA_SIZE ?= 25k
+OUTPUT = jtag_capture
 
 all: help
 
 %.json: $(VERILOG_SOURCES)
-	rm -f $(OUTPUT).bit $(OUTPUT).config $(OUTPUT).json
-	yosys -p 'read_verilog -sv $(VERILOG_SOURCES); synth_ecp5 -top top -json $@'
+	rm -f $(OUTPUT).bit $(OUTPUT).config synth.json
+	@echo "Running synthesis (yosys)"
+	yosys >synth.log -p 'read_verilog -sv $(VERILOG_SOURCES); synth_gowin -top top -family gw2a -json $@'
 
-$(GOWIN_EDA):
+$(OUTPUT)_pnr.json: $(OUTPUT)_synth.json $(OUTPUT).cst
 	@echo ""
-	@echo "Please install Gowin EDA, then set GOWINHOME to the"
-	@echo "directory where it was unpacked."
-	@exit 1
+	@echo "Running place-and-route (nextpnr)"
+	nextpnr-himbaechel 2>pnr.log --device GW2AR-LV18QN88C8/I7 --json $(OUTPUT)_synth.json --write $(OUTPUT)_pnr.json --vopt family=GW2A-18C --vopt cst=jtag_capture.cst
 
-$(OUTPUT): $(GOWIN_EDA)
-	$(GOWIN_EDA) build.tcl
+$(OUTPUT).fs: $(OUTPUT)_pnr.json
+	@echo ""
+	@echo "Generating bitstream (gowin_pack)"
+	gowin_pack -c -d GW2A-18C -o $(OUTPUT).fs $(OUTPUT)_pnr.json
 
-build: $(OUTPUT)
+build: $(OUTPUT).fs
 
-config: $(OUTPUT)
-	openFPGALoader -b tangnano20k $(OUTPUT)
+config: build
+	openFPGALoader $(OUTPUT).fs
 	@echo ""
 	@echo "To run a JTAG test, either type \"make run\" or"
 	@echo "run the demo.tcl script with OpenOCD."
@@ -47,6 +51,6 @@ help:
 	@echo "- run: execute a tcl script to communicate with the running design"
 
 clean:
-	rm -rf impl
+	rm -f $(OUTPUT).fs $(OUTPUT).config $(OUTPUT)_synth.json $(OUTPUT)_pnr.json *.log
 
 .PHONY: build clean install
