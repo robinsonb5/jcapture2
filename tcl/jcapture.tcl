@@ -179,9 +179,11 @@ proc ::jcapture::userdr {data} {
 	return [::jcapture::vdrscan $::jcapture::capture_width $data]
 }
 
-proc ::jcapture::usercmd {cmd data} {
+proc ::jcapture::usercmd {cmd {data ""}} {
 	::jcapture::userir $cmd
-	::jcapture::userdr $data
+	if {$data != ""} {
+		::jcapture::userdr $data
+	}
 }
 
 
@@ -385,6 +387,7 @@ proc ::jcapture::extractbits {word start width} {
 }
 
 # Dump the FIFO contents to a previously-created VCD file
+# and close the file when finished.
 proc ::jcapture::fifo_to_vcd { chan } {
 	set fields [lrange $::jcapture::fields 0 end-1]
 
@@ -438,6 +441,7 @@ proc ::jcapture::fifo_to_vcd { chan } {
 }
 
 # Dump the FIFO contents to a previously-created CSV file
+# and close the file when finished.
 proc ::jcapture::fifo_to_csv { chan {delim "\t"} } {
 	set fields [lrange $::jcapture::fields 0 end-1]
 
