@@ -46,11 +46,11 @@ lint:
 help:
 	@echo "Usage: make [option]"
 	@echo "Options:"
-	@echo "- debug: install to chip's temp memory (bitstream lost on power loss)"
-	@echo "- build: builds the bitstream"
-	@echo "         (append FPGA_SIZE=45k if building for icepi-zero-xl)"
-	@echo "- clean: delete generatred and temporary files"
-	@echo "- run: execute a tcl script to communicate with the running design"
+	@echo "- config: install to chip's temp memory (bitstream lost on power loss)"
+	@echo "- build:  builds the bitstream"
+	@echo "          (append FPGA_SIZE=45k if building for icepi-zero-xl)"
+	@echo "- clean:  delete generatred and temporary files"
+	@echo "- run:    execute a tcl script to communicate with the running design"
 
 clean:
 	rm -f $(OUTPUT).bit $(OUTPUT).config $(OUTPUT).json *.log

@@ -597,12 +597,12 @@ proc ::jcapture::settrigger {signal args} {
 		if {$signal == [lindex $record 0]} {
 			set signalwidth [lindex $record 1]
 			set mask [expr "(1 << $signalwidth) - 1"]
-			set i [llength $::jcapture::membernames]
+			set i [llength $::jcapture::fields]
 		}
 	}
 	
 	if {$mask==0} {
-		puts "Signal $sigal not found"
+		puts "Signal $signal not found"
 		return
 	}
 

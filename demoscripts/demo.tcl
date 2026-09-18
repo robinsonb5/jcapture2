@@ -53,7 +53,7 @@ puts "Waiting for the FIFO to fill"
 ::jcapture::usercmd led 4
 
 puts "Collecting the FIFO contents"
-puts "Capture should start when bit 10 rises,"
+puts "Capture should start when bit 10 falls,"
 puts "after a lead-in of 1/4 of the FIFO's depth."
 
 ::jcapture::dump_fifo
