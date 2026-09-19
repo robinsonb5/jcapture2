@@ -4,13 +4,6 @@
 #
 
 source "prologue.tcl"
-init
-scan_chain
-
-set capture_fields {
-	{ count_lo 16 }
-	{ count_hi 15 }
-}
 
 # Put design in reset
 ::jcapture::usercmd reset 1
