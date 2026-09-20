@@ -241,11 +241,14 @@ proc ::jcapture::wait_fifofull { } {
 		if {[string length $line] > 0} {
 			puts "Aborting"
 			command abort
-			command flushfifo
+			dump_fifo
+# Keep the fifo contents so we can save a partial capture
+#			command flushfifo
 			set done 1
 		}
 		set status [getstatus]
 	}
+	puts $status
 	wait_busy
 }
 
@@ -666,7 +669,7 @@ proc ::jcapture::cleartrigger {signal } {
 proc ::jcapture::setsubsample {schedule {mode ""} {mode2 ""} } {
 	set triggermode 0
 	if {$mode=="strobe" || $mode2=="strobe"} {set triggermode 0x80}
-	if {$mode=="trigger" || $mode2=="trigger"} {set triggermode [expr $triggermode | 0x40]}
+	if {$mode=="trigger" || $mode2=="trigger"} {set triggermode [expr "$triggermode | 0x40"]}
 	puts "Trigger mode: $triggermode"
 	set v [expr "$triggermode | ($schedule & 0x3f)"]
 	command subsample
