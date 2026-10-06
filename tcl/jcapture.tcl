@@ -241,7 +241,6 @@ proc ::jcapture::wait_fifofull { } {
 		if {[string length $line] > 0} {
 			puts "Aborting"
 			command abort
-			dump_fifo
 # Keep the fifo contents so we can save a partial capture
 #			command flushfifo
 			set done 1
